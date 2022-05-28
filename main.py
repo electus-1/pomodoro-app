@@ -1,4 +1,3 @@
-from itertools import count
 import tkinter as t
 
 # ---------------------------- CONSTANTS ------------------------------- #
@@ -8,29 +7,71 @@ GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
 FONT_NAME = "Courier"
 CHECKMARK = "✔"
-WORK_MIN = 25
-SHORT_BREAK_MIN = 5
-LONG_BREAK_MIN = 20
-
+WORK_MIN = 0.05
+SHORT_BREAK_MIN = 0.05
+LONG_BREAK_MIN = 0.1
+reps = 0
+timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- #
+def reset_timer():
+    global reps
+    reps = 0
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text, text="00:00")
+    greeting_label.config(text="Timer", fg=GREEN)
+    global checkmarks
+    checkmarks = ""
+    checkmark_label.config(text=checkmarks)
+
 
 # ---------------------------- TIMER MECHANISM ------------------------------- #
-def start_work_timer():
-    count_down(WORK_MIN * 60)
+def start_timer():
+    global reps
+    global checkmarks
+    if reps == 0:
+        greeting_label.config(text="Timer", fg=GREEN)
+        checkmarks = ""
+        checkmark_label.config(text=checkmarks)
+    reps += 1
+    if reps % 2 == 1:
+        count = WORK_MIN * 60
+        greeting_label.config(text="Work", fg=GREEN)
+    elif reps % 8 == 0:
+        count = LONG_BREAK_MIN * 60
+        greeting_label.config(text="Long Break", fg=RED)
+    elif reps % 2 == 0:
+        count = SHORT_BREAK_MIN * 60
+        greeting_label.config(text="Break", fg=PINK)
+
+    count_down(count=count)
 
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 def count_down(count):
+    global reps
+    global checkmarks
     minutes = count // 60
     seconds = count % 60
     if seconds < 10:
-        new_text = f"{minutes}:0{seconds}"
-    else:
-        new_text = f"{minutes}:{seconds}"
+        seconds = f"0{seconds}"
+    new_text = f"{minutes}:{seconds}"
     canvas.itemconfig(timer_text, text=new_text)
     if count > 0:
-        window.after(1000, count_down, count - 1)
+        global timer
+        timer = window.after(1000, count_down, count - 1)
+    else:
+        if reps % 2 == 0:
+            checkmarks += CHECKMARK
+            checkmark_label.config(text=checkmarks)
+
+        if reps == 8:
+            reps = 0
+            window.after_cancel(timer)
+            canvas.itemconfig(timer_text, text="00:00")
+
+        else:
+            start_timer()
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -47,16 +88,17 @@ timer_text = canvas.create_text(
 )
 canvas.grid(row=1, column=1)
 
-start_button = t.Button(text="Start", highlightthickness=0, command=start_work_timer)
+start_button = t.Button(text="Start", highlightthickness=0, command=start_timer)
 start_button.grid(row=2, column=0)
-reset_button = t.Button(text="Reset", highlightthickness=0)
+reset_button = t.Button(text="Reset", highlightthickness=0, command=reset_timer)
 reset_button.grid(row=2, column=2)
 greeting_label = t.Label(
     text="Timer", font=(FONT_NAME, 36, "bold"), fg=GREEN, bg=YELLOW
 )
 greeting_label.grid(row=0, column=1)
+checkmarks = ""
 checkmark_label = t.Label(
-    text=CHECKMARK, font=(FONT_NAME, 12, "bold"), fg=GREEN, bg=YELLOW
+    text=checkmarks, font=(FONT_NAME, 12, "bold"), fg=GREEN, bg=YELLOW
 )
 checkmark_label.grid(row=3, column=1)
 
