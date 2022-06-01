@@ -1,6 +1,6 @@
 import tkinter as t
 
-# ---------------------------- CONSTANTS ------------------------------- #
+
 PINK = "#e2979c"
 RED = "#e7305b"
 GREEN = "#9bdeac"
@@ -13,7 +13,7 @@ LONG_BREAK_MIN = 20
 reps = 0
 timer = None
 
-# ---------------------------- TIMER RESET ------------------------------- #
+
 def reset_timer():
     global reps
     reps = 0
@@ -25,7 +25,7 @@ def reset_timer():
     checkmark_label.config(text=checkmarks)
 
 
-# ---------------------------- TIMER MECHANISM ------------------------------- #
+
 def start_timer():
     global reps
     global checkmarks
@@ -47,7 +47,6 @@ def start_timer():
     count_down(count=count)
 
 
-# ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 def count_down(count):
     global reps
     global checkmarks
@@ -74,7 +73,7 @@ def count_down(count):
             start_timer()
 
 
-# ---------------------------- UI SETUP ------------------------------- #
+
 
 window = t.Tk()
 window.title("Pomodoro App")
